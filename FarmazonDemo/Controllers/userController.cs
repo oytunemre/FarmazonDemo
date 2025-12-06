@@ -108,14 +108,7 @@ namespace FarmazonDemo.Controllers
 
         }
 
-        [HttpGet("test-all")]
-        public IActionResult TestAll()
-        {
-            var users = dbContext.Users.ToList();
-            return Ok(users);
-        }
-
-
+      
 
     }
 
