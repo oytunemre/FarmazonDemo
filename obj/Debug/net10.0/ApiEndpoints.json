@@ -1,0 +1,239 @@
+[
+  {
+    "ContainingType": "FarmazonDemo.Controllers.ListingController",
+    "Method": "GetAll",
+    "RelativePath": "api/listings",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FarmazonDemo.Controllers.ListingController",
+    "Method": "Create",
+    "RelativePath": "api/listings",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "dto",
+        "Type": "FarmazonDemo.Models.Dto.ListingDto.CreateListingDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FarmazonDemo.Controllers.ListingController",
+    "Method": "GetById",
+    "RelativePath": "api/listings/{id}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FarmazonDemo.Controllers.ListingController",
+    "Method": "Update",
+    "RelativePath": "api/listings/{id}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "dto",
+        "Type": "FarmazonDemo.Models.Dto.ListingDto.UpdateListingDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FarmazonDemo.Controllers.ListingController",
+    "Method": "Delete",
+    "RelativePath": "api/listings/{id}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FarmazonDemo.Controllers.ProductController",
+    "Method": "getAllProducts",
+    "RelativePath": "api/Product",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FarmazonDemo.Controllers.ProductController",
+    "Method": "AddProduct",
+    "RelativePath": "api/Product",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "AddProductDto",
+        "Type": "FarmazonDemo.Models.Dto.ProductDto.AddProductDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FarmazonDemo.Controllers.ProductController",
+    "Method": "getProductById",
+    "RelativePath": "api/Product/{ProductId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "ProductId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FarmazonDemo.Controllers.ProductController",
+    "Method": "updateProduct",
+    "RelativePath": "api/Product/{ProductId}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "ProductId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "productUpdateDto",
+        "Type": "FarmazonDemo.Models.Dto.ProductDto.ProductUpdateDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FarmazonDemo.Controllers.ProductController",
+    "Method": "DeleteProduct",
+    "RelativePath": "api/Product/{ProductId}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "ProductId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FarmazonDemo.Controllers.UserController",
+    "Method": "GetAllUsers",
+    "RelativePath": "api/User",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FarmazonDemo.Controllers.UserController",
+    "Method": "AddUser",
+    "RelativePath": "api/User",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "addUserDto",
+        "Type": "FarmazonDemo.Models.Dto.adduserDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FarmazonDemo.Controllers.UserController",
+    "Method": "GetUserbyId",
+    "RelativePath": "api/User/{UserId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "UserId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FarmazonDemo.Controllers.UserController",
+    "Method": "UpdateUser",
+    "RelativePath": "api/User/{UserId}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "UserId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "userUpdateDto",
+        "Type": "FarmazonDemo.Models.Dto.UserUpdateDto",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "FarmazonDemo.Controllers.UserController",
+    "Method": "DeleteUser",
+    "RelativePath": "api/User/{UserId}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "UserId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  }
+]
