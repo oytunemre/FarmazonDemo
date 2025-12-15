@@ -29,11 +29,11 @@ namespace FarmazonDemo.Controllers
 
 
         [HttpGet]
-        [Route("{id:guid}")]
-        public IActionResult GetUserbyId(Guid id)
+        [Route("{UserId:int}")]
+        public IActionResult GetUserbyId(int UserId)
         {
 
-            var user = dbContext.Users.Find(id);
+            var user = dbContext.Users.Find(UserId);
 
             if (user is null)
             {
@@ -69,11 +69,11 @@ namespace FarmazonDemo.Controllers
 
 
         [HttpPut]
-        [Route("{id:guid}")]
-        public IActionResult UpdateUser(Guid id, UserUpdateDto userUpdateDto)
+        [Route("{UserId:int}")]
+        public IActionResult UpdateUser(int UserId, UserUpdateDto userUpdateDto)
         {
 
-            var user = dbContext.Users.Find(id);
+            var user = dbContext.Users.Find(UserId);
             if (user is null)
             {
                 return NotFound();
@@ -83,17 +83,17 @@ namespace FarmazonDemo.Controllers
             user.Password = userUpdateDto.Password;
             user.Username = userUpdateDto.Username;
             dbContext.SaveChanges();
-
+            
             return Ok(user);
         }
 
         [HttpDelete]
-        [Route("{id:guid}")]
+        [Route("{UserId:int}")]
 
-        public IActionResult DeleteUser(Guid id)
+        public IActionResult DeleteUser(int UserId)
         {
 
-            var user = dbContext.Users.Find(id);
+            var user = dbContext.Users.Find(UserId);
 
             if (user is null)
             {
@@ -110,6 +110,6 @@ namespace FarmazonDemo.Controllers
 
       
 
-    }
+    }   
 
 }
