@@ -2,6 +2,7 @@
 using FarmazonDemo.Models.Dto.SellerDto;
 using FarmazonDemo.Models.Enums;
 using FarmazonDemo.Services.Common;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -9,6 +10,7 @@ namespace FarmazonDemo.Controllers;
 
 [ApiController]
 [Route("api/seller")]
+[Authorize(Roles = "Admin,Seller")]
 public class SellerController : ControllerBase
 {
     private readonly ApplicationDbContext _db;

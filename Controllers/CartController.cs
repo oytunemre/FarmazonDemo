@@ -1,11 +1,13 @@
 ﻿using FarmazonDemo.Models.Dto.CartDto;
 using FarmazonDemo.Services.Carts;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FarmazonDemo.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize]
 public class CartController : ControllerBase
 {
     private readonly ICartService _cartService;

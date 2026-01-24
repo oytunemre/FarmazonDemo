@@ -1,11 +1,13 @@
 ﻿using FarmazonDemo.Models.Dto.UserDto;
 using FarmazonDemo.Services.Users;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FarmazonDemo.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize(Roles = "Admin")]
 public class UserController : ControllerBase
 {
     private readonly IUserService _service;

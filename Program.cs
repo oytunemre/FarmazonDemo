@@ -1,4 +1,6 @@
 using FarmazonDemo.Data;
+using FarmazonDemo.Models;
+using FarmazonDemo.Services.Auth;
 using FarmazonDemo.Services.Carts;
 using FarmazonDemo.Services.Common;
 using FarmazonDemo.Services.Listings;
@@ -6,7 +8,10 @@ using FarmazonDemo.Services.Products;
 using FarmazonDemo.Services.Users;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 using System.Text.Json.Serialization;
 using FarmazonDemo.Services.Orders;
 using FarmazonDemo.Services.Payments;
@@ -17,7 +22,7 @@ using FarmazonDemo.Services.Shipments;
 var builder = WebApplication.CreateBuilder(args);
 
 // --------------------
-// SERVICES (Build'den ÖNCE)
+// SERVICES (Build'den ï¿½NCE)
 // --------------------
 
 // Controllers + Enum String Converter
@@ -29,14 +34,64 @@ builder.Services.AddControllers()
 builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
-// OpenAPI/Swagger (senin AddOpenApi kullanýmý)
+// OpenAPI/Swagger (senin AddOpenApi kullanï¿½mï¿½)
 builder.Services.AddOpenApi();
 
 // DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// JWT Settings Configuration
+builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
+
+// JWT Authentication
+var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();
+if (jwtSettings == null)
+    throw new InvalidOperationException("JWT settings are not configured properly");
+
+builder.Services.AddAuthentication(options =>
+{
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = jwtSettings.Issuer,
+        ValidAudience = jwtSettings.Audience,
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSettings.SecretKey)),
+        ClockSkew = TimeSpan.Zero
+    };
+});
+
+builder.Services.AddAuthorization();
+
+// CORS Configuration
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
+    ?? new[] { "http://localhost:3000" };
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins(allowedOrigins)
+              .AllowAnyMethod()
+              .AllowAnyHeader()
+              .AllowCredentials();
+    });
+});
+
+// Health Checks
+builder.Services.AddHealthChecks()
+    .AddDbContextCheck<ApplicationDbContext>("database");
+
 // DI - Services
+builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IListingService, ListingService>();
@@ -62,11 +117,21 @@ if (app.Environment.IsDevelopment())
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseHttpsRedirection();
+
+// CORS must be before Authentication/Authorization
+app.UseCors("AllowFrontend");
+
+app.UseAuthentication();
 app.UseAuthorization();
+
+// Health check endpoints
+app.MapHealthChecks("/health");
+app.MapHealthChecks("/health/ready");
+
 app.MapControllers();
 
 // --------------------
-// SEED (Build'den sonra, Run'dan önce)
+// SEED (Build'den sonra, Run'dan ï¿½nce)
 // --------------------
 using (var scope = app.Services.CreateScope())
 {

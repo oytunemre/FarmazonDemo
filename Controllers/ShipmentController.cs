@@ -1,12 +1,14 @@
 ﻿using FarmazonDemo.Models.Dto.Shipment;
 using FarmazonDemo.Services.Shipments;
 using FarmazonDemo.Services.Common;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FarmazonDemo.Controllers;
 
 [ApiController]
 [Route("api/shipments")]
+[Authorize(Roles = "Admin,Seller")]
 public class ShipmentController : ControllerBase
 {
     private readonly IShipmentService _shipmentService;
