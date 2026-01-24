@@ -1,6 +1,6 @@
 ﻿using FarmazonDemo.Models.Dto.Shipment;
 
-namespace FarmazonDemo.Services.Shipment;
+namespace FarmazonDemo.Services.Shipments;
 
 public interface IShipmentService
 {

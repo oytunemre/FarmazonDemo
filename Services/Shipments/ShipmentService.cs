@@ -5,7 +5,7 @@ using FarmazonDemo.Models.Enums;
 using FarmazonDemo.Services.Common;
 using Microsoft.EntityFrameworkCore;
 
-namespace FarmazonDemo.Services.Shipment;
+namespace FarmazonDemo.Services.Shipments;
 
 public class ShipmentService : IShipmentService
 {

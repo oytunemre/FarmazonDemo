@@ -1,5 +1,5 @@
 using FarmazonDemo.Data;
-using FarmazonDemo.Services.Cart;
+using FarmazonDemo.Services.Carts;
 using FarmazonDemo.Services.Common;
 using FarmazonDemo.Services.Listings;
 using FarmazonDemo.Services.Products;
@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using FarmazonDemo.Services.Orders;
 using FarmazonDemo.Services.Payments;
-using FarmazonDemo.Services.Shipment;
+using FarmazonDemo.Services.Shipments;
 
 
 

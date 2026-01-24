@@ -3,7 +3,7 @@ using FarmazonDemo.Models.Dto.CartDto;
 using FarmazonDemo.Models.Entities;
 using Microsoft.EntityFrameworkCore;
 
-namespace FarmazonDemo.Services.Cart;
+namespace FarmazonDemo.Services.Carts;
 
 public class CartService : ICartService
 {
