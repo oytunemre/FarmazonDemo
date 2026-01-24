@@ -23,7 +23,7 @@ using FarmazonDemo.Services.Shipments;
 var builder = WebApplication.CreateBuilder(args);
 
 // --------------------
-// SERVICES (Build'den �NCE)
+// SERVICES (Build'den ÖNCE)
 // --------------------
 
 // Controllers + Enum String Converter
@@ -166,7 +166,7 @@ app.MapHealthChecks("/health/ready");
 app.MapControllers();
 
 // --------------------
-// SEED (Build'den sonra, Run'dan �nce)
+// SEED (Build'den sonra, Run'dan önce)
 // --------------------
 using (var scope = app.Services.CreateScope())
 {
