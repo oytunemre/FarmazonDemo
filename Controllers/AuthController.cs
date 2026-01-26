@@ -58,5 +58,49 @@ namespace FarmazonDemo.Controllers
                 Role = role
             });
         }
+
+        /// <summary>
+        /// Admin only endpoint - Get all users summary
+        /// </summary>
+        [HttpGet("admin/stats")]
+        [Authorize(Policy = "AdminOnly")]
+        public async Task<ActionResult<object>> GetAdminStats()
+        {
+            var stats = await _authService.GetUserStatsAsync();
+            return Ok(stats);
+        }
+
+        /// <summary>
+        /// Seller or Admin endpoint
+        /// </summary>
+        [HttpGet("seller/dashboard")]
+        [Authorize(Policy = "SellerOnly")]
+        public ActionResult<object> GetSellerDashboard()
+        {
+            var userId = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+            return Ok(new { Message = "Seller Dashboard", UserId = userId });
+        }
+
+        /// <summary>
+        /// Refresh access token using refresh token
+        /// </summary>
+        [HttpPost("refresh")]
+        [AllowAnonymous]
+        public async Task<ActionResult<TokenResponseDto>> RefreshToken([FromBody] RefreshTokenRequestDto dto)
+        {
+            var result = await _authService.RefreshTokenAsync(dto.RefreshToken);
+            return Ok(result);
+        }
+
+        /// <summary>
+        /// Revoke refresh token (logout)
+        /// </summary>
+        [HttpPost("revoke")]
+        [Authorize]
+        public async Task<ActionResult> RevokeToken([FromBody] RefreshTokenRequestDto dto)
+        {
+            await _authService.RevokeRefreshTokenAsync(dto.RefreshToken);
+            return Ok(new { Message = "Token revoked successfully" });
+        }
     }
 }

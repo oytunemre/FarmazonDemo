@@ -67,7 +67,12 @@ builder.Services.AddAuthentication(options =>
     };
 });
 
-builder.Services.AddAuthorization();
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOnly", policy => policy.RequireRole("Admin"));
+    options.AddPolicy("SellerOnly", policy => policy.RequireRole("Seller", "Admin"));
+    options.AddPolicy("CustomerOnly", policy => policy.RequireRole("Customer", "Seller", "Admin"));
+});
 
 // CORS Configuration
 var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()

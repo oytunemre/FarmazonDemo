@@ -8,6 +8,7 @@ using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace FarmazonDemo.Services.Auth
@@ -59,6 +60,10 @@ namespace FarmazonDemo.Services.Auth
             var token = GenerateJwtToken(user.Id, user.Username, user.Email, user.Role.ToString());
             var expiresAt = DateTime.UtcNow.AddMinutes(_jwtSettings.ExpiryMinutes);
 
+            // Generate refresh token
+            var refreshToken = await CreateRefreshTokenAsync(user.Id);
+            await _context.SaveChangesAsync();
+
             return new AuthResponseDto
             {
                 UserId = user.Id,
@@ -67,7 +72,9 @@ namespace FarmazonDemo.Services.Auth
                 Username = user.Username,
                 Role = user.Role,
                 Token = token,
-                ExpiresAt = expiresAt
+                ExpiresAt = expiresAt,
+                RefreshToken = refreshToken.Token,
+                RefreshTokenExpiresAt = refreshToken.ExpiresAt
             };
         }
 
@@ -92,6 +99,10 @@ namespace FarmazonDemo.Services.Auth
             var token = GenerateJwtToken(user.Id, user.Username, user.Email, user.Role.ToString());
             var expiresAt = DateTime.UtcNow.AddMinutes(_jwtSettings.ExpiryMinutes);
 
+            // Generate refresh token
+            var refreshToken = await CreateRefreshTokenAsync(user.Id);
+            await _context.SaveChangesAsync();
+
             return new AuthResponseDto
             {
                 UserId = user.Id,
@@ -100,7 +111,9 @@ namespace FarmazonDemo.Services.Auth
                 Username = user.Username,
                 Role = user.Role,
                 Token = token,
-                ExpiresAt = expiresAt
+                ExpiresAt = expiresAt,
+                RefreshToken = refreshToken.Token,
+                RefreshTokenExpiresAt = refreshToken.ExpiresAt
             };
         }
 
@@ -127,6 +140,94 @@ namespace FarmazonDemo.Services.Auth
             );
 
             return new JwtSecurityTokenHandler().WriteToken(token);
+        }
+
+        public async Task<object> GetUserStatsAsync()
+        {
+            var totalUsers = await _context.Users.CountAsync();
+            var customerCount = await _context.Users.CountAsync(u => u.Role == Models.Enums.UserRole.Customer);
+            var sellerCount = await _context.Users.CountAsync(u => u.Role == Models.Enums.UserRole.Seller);
+            var adminCount = await _context.Users.CountAsync(u => u.Role == Models.Enums.UserRole.Admin);
+
+            return new
+            {
+                TotalUsers = totalUsers,
+                CustomerCount = customerCount,
+                SellerCount = sellerCount,
+                AdminCount = adminCount
+            };
+        }
+
+        public async Task<TokenResponseDto> RefreshTokenAsync(string refreshToken)
+        {
+            var storedToken = await _context.RefreshTokens
+                .Include(rt => rt.User)
+                .FirstOrDefaultAsync(rt => rt.Token == refreshToken && !rt.IsRevoked);
+
+            if (storedToken == null)
+                throw new UnauthorizedException("Invalid refresh token");
+
+            if (storedToken.ExpiresAt < DateTime.UtcNow)
+            {
+                storedToken.IsRevoked = true;
+                storedToken.RevokedAt = DateTime.UtcNow;
+                await _context.SaveChangesAsync();
+                throw new UnauthorizedException("Refresh token expired");
+            }
+
+            var user = storedToken.User;
+
+            // Revoke old refresh token
+            storedToken.IsRevoked = true;
+            storedToken.RevokedAt = DateTime.UtcNow;
+
+            // Generate new tokens
+            var newAccessToken = GenerateJwtToken(user.Id, user.Username, user.Email, user.Role.ToString());
+            var newRefreshToken = await CreateRefreshTokenAsync(user.Id);
+
+            await _context.SaveChangesAsync();
+
+            return new TokenResponseDto
+            {
+                AccessToken = newAccessToken,
+                RefreshToken = newRefreshToken.Token,
+                AccessTokenExpiresAt = DateTime.UtcNow.AddMinutes(_jwtSettings.ExpiryMinutes),
+                RefreshTokenExpiresAt = newRefreshToken.ExpiresAt
+            };
+        }
+
+        public async Task RevokeRefreshTokenAsync(string refreshToken)
+        {
+            var storedToken = await _context.RefreshTokens
+                .FirstOrDefaultAsync(rt => rt.Token == refreshToken);
+
+            if (storedToken == null)
+                throw new NotFoundException("Refresh token not found");
+
+            storedToken.IsRevoked = true;
+            storedToken.RevokedAt = DateTime.UtcNow;
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task<RefreshToken> CreateRefreshTokenAsync(int userId)
+        {
+            var refreshToken = new RefreshToken
+            {
+                Token = GenerateRefreshTokenString(),
+                ExpiresAt = DateTime.UtcNow.AddDays(_jwtSettings.RefreshTokenExpiryDays),
+                UserId = userId
+            };
+
+            _context.RefreshTokens.Add(refreshToken);
+            return refreshToken;
+        }
+
+        private static string GenerateRefreshTokenString()
+        {
+            var randomBytes = new byte[64];
+            using var rng = RandomNumberGenerator.Create();
+            rng.GetBytes(randomBytes);
+            return Convert.ToBase64String(randomBytes);
         }
     }
 }
