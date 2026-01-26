@@ -3,6 +3,7 @@ using FarmazonDemo.Models;
 using FarmazonDemo.Services.Auth;
 using FarmazonDemo.Services.Carts;
 using FarmazonDemo.Services.Common;
+using FarmazonDemo.Services.Email;
 using FarmazonDemo.Services.Listings;
 using FarmazonDemo.Services.Products;
 using FarmazonDemo.Services.Users;
@@ -41,6 +42,10 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 // JWT Settings Configuration
 builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
+
+// Email Settings Configuration
+builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("EmailSettings"));
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 // JWT Authentication
 var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<JwtSettings>();

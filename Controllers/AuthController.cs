@@ -102,5 +102,49 @@ namespace FarmazonDemo.Controllers
             await _authService.RevokeRefreshTokenAsync(dto.RefreshToken);
             return Ok(new { Message = "Token revoked successfully" });
         }
+
+        /// <summary>
+        /// Verify email address
+        /// </summary>
+        [HttpGet("verify-email")]
+        [AllowAnonymous]
+        public async Task<ActionResult> VerifyEmail([FromQuery] string token)
+        {
+            await _authService.VerifyEmailAsync(token);
+            return Ok(new { Message = "Email verified successfully. You can now login." });
+        }
+
+        /// <summary>
+        /// Resend verification email
+        /// </summary>
+        [HttpPost("resend-verification")]
+        [AllowAnonymous]
+        public async Task<ActionResult> ResendVerificationEmail([FromBody] EmailRequestDto dto)
+        {
+            await _authService.ResendVerificationEmailAsync(dto.Email);
+            return Ok(new { Message = "Verification email sent. Please check your inbox." });
+        }
+
+        /// <summary>
+        /// Request password reset
+        /// </summary>
+        [HttpPost("forgot-password")]
+        [AllowAnonymous]
+        public async Task<ActionResult> ForgotPassword([FromBody] EmailRequestDto dto)
+        {
+            await _authService.ForgotPasswordAsync(dto.Email);
+            return Ok(new { Message = "If the email exists, a password reset link has been sent." });
+        }
+
+        /// <summary>
+        /// Reset password with token
+        /// </summary>
+        [HttpPost("reset-password")]
+        [AllowAnonymous]
+        public async Task<ActionResult> ResetPassword([FromBody] ResetPasswordDto dto)
+        {
+            await _authService.ResetPasswordAsync(dto.Token, dto.NewPassword);
+            return Ok(new { Message = "Password reset successfully. You can now login with your new password." });
+        }
     }
 }

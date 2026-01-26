@@ -3,6 +3,7 @@ using FarmazonDemo.Models;
 using FarmazonDemo.Models.Dto;
 using FarmazonDemo.Models.Entities;
 using FarmazonDemo.Services.Common;
+using FarmazonDemo.Services.Email;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
@@ -17,11 +18,19 @@ namespace FarmazonDemo.Services.Auth
     {
         private readonly ApplicationDbContext _context;
         private readonly JwtSettings _jwtSettings;
+        private readonly IEmailService _emailService;
 
-        public AuthService(ApplicationDbContext context, IOptions<JwtSettings> jwtSettings)
+        private const int MaxFailedLoginAttempts = 5;
+        private const int LockoutDurationMinutes = 15;
+
+        public AuthService(
+            ApplicationDbContext context,
+            IOptions<JwtSettings> jwtSettings,
+            IEmailService emailService)
         {
             _context = context;
             _jwtSettings = jwtSettings.Value;
+            _emailService = emailService;
         }
 
         public async Task<AuthResponseDto> RegisterAsync(RegisterDto dto)
@@ -43,6 +52,9 @@ namespace FarmazonDemo.Services.Auth
             // Hash password using BCrypt
             var hashedPassword = BCrypt.Net.BCrypt.HashPassword(dto.Password);
 
+            // Generate email verification token
+            var emailVerificationToken = GenerateSecureToken();
+
             // Create user
             var user = new Models.Entities.Users
             {
@@ -50,11 +62,17 @@ namespace FarmazonDemo.Services.Auth
                 Email = dto.Email,
                 Username = dto.Username,
                 Password = hashedPassword,
-                Role = dto.Role
+                Role = dto.Role,
+                EmailVerified = false,
+                EmailVerificationToken = emailVerificationToken,
+                EmailVerificationTokenExpiresAt = DateTime.UtcNow.AddHours(24)
             };
 
             _context.Users.Add(user);
             await _context.SaveChangesAsync();
+
+            // Send verification email
+            await _emailService.SendEmailVerificationAsync(user.Email, emailVerificationToken);
 
             // Generate JWT token
             var token = GenerateJwtToken(user.Id, user.Username, user.Email, user.Role.ToString());
@@ -89,11 +107,43 @@ namespace FarmazonDemo.Services.Auth
             if (user == null)
                 throw new NotFoundException("Invalid credentials");
 
+            // Check if account is locked
+            if (user.LockoutEndTime.HasValue && user.LockoutEndTime > DateTime.UtcNow)
+            {
+                var remainingMinutes = (int)(user.LockoutEndTime.Value - DateTime.UtcNow).TotalMinutes + 1;
+                throw new UnauthorizedException($"Account is locked. Try again in {remainingMinutes} minutes.");
+            }
+
             // Verify password
             var isPasswordValid = BCrypt.Net.BCrypt.Verify(dto.Password, user.Password);
 
             if (!isPasswordValid)
+            {
+                // Increment failed login attempts
+                user.FailedLoginAttempts++;
+
+                if (user.FailedLoginAttempts >= MaxFailedLoginAttempts)
+                {
+                    user.LockoutEndTime = DateTime.UtcNow.AddMinutes(LockoutDurationMinutes);
+                    await _context.SaveChangesAsync();
+
+                    // Send notification email
+                    await _emailService.SendAccountLockedAsync(user.Email, user.LockoutEndTime.Value);
+
+                    throw new UnauthorizedException($"Account locked due to {MaxFailedLoginAttempts} failed attempts. Try again in {LockoutDurationMinutes} minutes.");
+                }
+
+                await _context.SaveChangesAsync();
                 throw new NotFoundException("Invalid credentials");
+            }
+
+            // Check if email is verified
+            if (!user.EmailVerified)
+                throw new UnauthorizedException("Please verify your email before logging in.");
+
+            // Reset failed login attempts on successful login
+            user.FailedLoginAttempts = 0;
+            user.LockoutEndTime = null;
 
             // Generate JWT token
             var token = GenerateJwtToken(user.Id, user.Username, user.Email, user.Role.ToString());
@@ -228,6 +278,95 @@ namespace FarmazonDemo.Services.Auth
             using var rng = RandomNumberGenerator.Create();
             rng.GetBytes(randomBytes);
             return Convert.ToBase64String(randomBytes);
+        }
+
+        private static string GenerateSecureToken()
+        {
+            var randomBytes = new byte[32];
+            using var rng = RandomNumberGenerator.Create();
+            rng.GetBytes(randomBytes);
+            return Convert.ToHexString(randomBytes).ToLower();
+        }
+
+        public async Task<bool> VerifyEmailAsync(string token)
+        {
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.EmailVerificationToken == token);
+
+            if (user == null)
+                throw new NotFoundException("Invalid verification token");
+
+            if (user.EmailVerificationTokenExpiresAt < DateTime.UtcNow)
+                throw new BadRequestException("Verification token has expired. Please request a new one.");
+
+            if (user.EmailVerified)
+                throw new BadRequestException("Email is already verified");
+
+            user.EmailVerified = true;
+            user.EmailVerificationToken = null;
+            user.EmailVerificationTokenExpiresAt = null;
+
+            await _context.SaveChangesAsync();
+            return true;
+        }
+
+        public async Task ResendVerificationEmailAsync(string email)
+        {
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
+
+            if (user == null)
+                throw new NotFoundException("User not found");
+
+            if (user.EmailVerified)
+                throw new BadRequestException("Email is already verified");
+
+            // Generate new token
+            user.EmailVerificationToken = GenerateSecureToken();
+            user.EmailVerificationTokenExpiresAt = DateTime.UtcNow.AddHours(24);
+
+            await _context.SaveChangesAsync();
+            await _emailService.SendEmailVerificationAsync(user.Email, user.EmailVerificationToken);
+        }
+
+        public async Task ForgotPasswordAsync(string email)
+        {
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
+
+            // Don't reveal if user exists or not for security
+            if (user == null)
+                return;
+
+            // Generate password reset token
+            user.PasswordResetToken = GenerateSecureToken();
+            user.PasswordResetTokenExpiresAt = DateTime.UtcNow.AddHours(1);
+
+            await _context.SaveChangesAsync();
+            await _emailService.SendPasswordResetAsync(user.Email, user.PasswordResetToken);
+        }
+
+        public async Task ResetPasswordAsync(string token, string newPassword)
+        {
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.PasswordResetToken == token);
+
+            if (user == null)
+                throw new NotFoundException("Invalid reset token");
+
+            if (user.PasswordResetTokenExpiresAt < DateTime.UtcNow)
+                throw new BadRequestException("Reset token has expired. Please request a new one.");
+
+            // Update password
+            user.Password = BCrypt.Net.BCrypt.HashPassword(newPassword);
+            user.PasswordResetToken = null;
+            user.PasswordResetTokenExpiresAt = null;
+
+            // Reset lockout on password change
+            user.FailedLoginAttempts = 0;
+            user.LockoutEndTime = null;
+
+            await _context.SaveChangesAsync();
         }
     }
 }
