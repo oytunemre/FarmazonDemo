@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\nilgo\\source\\repos\\FarmazonDemo\\FarmazonDemo\\FarmazonDemo.csproj": {}
+    "C:\\Users\\nilgo\\source\\repos\\oytunemre\\FarmazonDemo\\FarmazonDemo.csproj": {}
   },
   "projects": {
-    "C:\\Users\\nilgo\\source\\repos\\FarmazonDemo\\FarmazonDemo\\FarmazonDemo.csproj": {
+    "C:\\Users\\nilgo\\source\\repos\\oytunemre\\FarmazonDemo\\FarmazonDemo.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\nilgo\\source\\repos\\FarmazonDemo\\FarmazonDemo\\FarmazonDemo.csproj",
+        "projectUniqueName": "C:\\Users\\nilgo\\source\\repos\\oytunemre\\FarmazonDemo\\FarmazonDemo.csproj",
         "projectName": "FarmazonDemo",
-        "projectPath": "C:\\Users\\nilgo\\source\\repos\\FarmazonDemo\\FarmazonDemo\\FarmazonDemo.csproj",
+        "projectPath": "C:\\Users\\nilgo\\source\\repos\\oytunemre\\FarmazonDemo\\FarmazonDemo.csproj",
         "packagesPath": "C:\\Users\\nilgo\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\nilgo\\source\\repos\\FarmazonDemo\\FarmazonDemo\\obj\\",
+        "outputPath": "C:\\Users\\nilgo\\source\\repos\\oytunemre\\FarmazonDemo\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -50,11 +50,15 @@
         "net10.0": {
           "targetAlias": "net10.0",
           "dependencies": {
+            "BCrypt.Net-Next": {
+              "target": "Package",
+              "version": "[4.0.3, )"
+            },
             "FluentValidation.AspNetCore": {
               "target": "Package",
               "version": "[11.3.1, )"
             },
-            "Microsoft.AspNetCore.OpenApi": {
+            "Microsoft.AspNetCore.Authentication.JwtBearer": {
               "target": "Package",
               "version": "[10.0.0, )"
             },
@@ -74,9 +78,9 @@
               "target": "Package",
               "version": "[10.0.0, )"
             },
-            "Swashbuckle.AspNetCore": {
+            "Microsoft.Extensions.Diagnostics.HealthChecks.EntityFrameworkCore": {
               "target": "Package",
-              "version": "[10.0.1, )"
+              "version": "[10.0.0, )"
             }
           },
           "imports": [
@@ -98,7 +102,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.100/PortableRuntimeIdentifierGraph.json",
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\10.0.102/PortableRuntimeIdentifierGraph.json",
           "packagesToPrune": {
             "Microsoft.AspNetCore": "(,10.0.32767]",
             "Microsoft.AspNetCore.Antiforgery": "(,10.0.32767]",
