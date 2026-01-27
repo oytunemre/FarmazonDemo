@@ -1,11 +1,13 @@
 ﻿using FarmazonDemo.Models.Dto.OrderDto;
 using FarmazonDemo.Services.Orders;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FarmazonDemo.Controllers
 {
     [Route("api/orders")]
     [ApiController]
+    [Authorize]
     public class OrderController : ControllerBase
     {
         private readonly IOrderService _service;

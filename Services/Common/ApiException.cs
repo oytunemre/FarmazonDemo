@@ -24,3 +24,8 @@ public sealed class BadRequestException : ApiException
 {
     public BadRequestException(string message) : base(400, message) { }
 }
+
+public sealed class UnauthorizedException : ApiException
+{
+    public UnauthorizedException(string message) : base(401, message) { }
+}

@@ -22,6 +22,55 @@ namespace FarmazonDemo.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
+            modelBuilder.Entity("FarmazonDemo.Models.Entities.AuditLog", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("EntityId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("EntityType")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("IpAddress")
+                        .HasMaxLength(45)
+                        .HasColumnType("nvarchar(45)");
+
+                    b.Property<string>("NewValues")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("OldValues")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("UserAgent")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("AuditLogs");
+                });
+
             modelBuilder.Entity("FarmazonDemo.Models.Entities.Cart", b =>
                 {
                     b.Property<int>("Id")
@@ -49,7 +98,7 @@ namespace FarmazonDemo.Migrations
 
                     b.HasIndex("UserId");
 
-                    b.ToTable("Carts", (string)null);
+                    b.ToTable("Carts");
                 });
 
             modelBuilder.Entity("FarmazonDemo.Models.Entities.CartItem", b =>
@@ -92,7 +141,7 @@ namespace FarmazonDemo.Migrations
                         .IsUnique()
                         .HasFilter("[IsDeleted] = 0");
 
-                    b.ToTable("CartItems", (string)null);
+                    b.ToTable("CartItems");
                 });
 
             modelBuilder.Entity("FarmazonDemo.Models.Entities.Listing", b =>
@@ -141,7 +190,7 @@ namespace FarmazonDemo.Migrations
 
                     b.HasIndex("SellerId");
 
-                    b.ToTable("Listings", (string)null);
+                    b.ToTable("Listings");
                 });
 
             modelBuilder.Entity("FarmazonDemo.Models.Entities.Order", b =>
@@ -179,7 +228,7 @@ namespace FarmazonDemo.Migrations
 
                     b.HasIndex("BuyerId");
 
-                    b.ToTable("Orders", (string)null);
+                    b.ToTable("Orders");
                 });
 
             modelBuilder.Entity("FarmazonDemo.Models.Entities.PaymentEvent", b =>
@@ -215,7 +264,7 @@ namespace FarmazonDemo.Migrations
 
                     b.HasIndex("PaymentIntentId");
 
-                    b.ToTable("PaymentEvents", (string)null);
+                    b.ToTable("PaymentEvents");
                 });
 
             modelBuilder.Entity("FarmazonDemo.Models.Entities.PaymentIntent", b =>
@@ -273,7 +322,7 @@ namespace FarmazonDemo.Migrations
                     b.HasIndex("OrderId")
                         .IsUnique();
 
-                    b.ToTable("PaymentIntents", (string)null);
+                    b.ToTable("PaymentIntents");
                 });
 
             modelBuilder.Entity("FarmazonDemo.Models.Entities.Product", b =>
@@ -306,7 +355,7 @@ namespace FarmazonDemo.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Products", (string)null);
+                    b.ToTable("Products");
                 });
 
             modelBuilder.Entity("FarmazonDemo.Models.Entities.ProductBarcode", b =>
@@ -345,7 +394,50 @@ namespace FarmazonDemo.Migrations
 
                     b.HasIndex("ProductId");
 
-                    b.ToTable("ProductBarcodes", (string)null);
+                    b.ToTable("ProductBarcodes");
+                });
+
+            modelBuilder.Entity("FarmazonDemo.Models.Entities.RefreshToken", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("DeletedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("IsRevoked")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("RevokedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Token")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("UpdatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RefreshTokens");
                 });
 
             modelBuilder.Entity("FarmazonDemo.Models.Entities.SellerOrder", b =>
@@ -388,7 +480,7 @@ namespace FarmazonDemo.Migrations
 
                     b.HasIndex("SellerId");
 
-                    b.ToTable("SellerOrders", (string)null);
+                    b.ToTable("SellerOrders");
                 });
 
             modelBuilder.Entity("FarmazonDemo.Models.Entities.SellerOrderItem", b =>
@@ -439,7 +531,7 @@ namespace FarmazonDemo.Migrations
 
                     b.HasIndex("SellerOrderId");
 
-                    b.ToTable("SellerOrderItems", (string)null);
+                    b.ToTable("SellerOrderItems");
                 });
 
             modelBuilder.Entity("FarmazonDemo.Models.Entities.Shipment", b =>
@@ -490,7 +582,7 @@ namespace FarmazonDemo.Migrations
 
                     b.HasIndex("TrackingNumber");
 
-                    b.ToTable("Shipments", (string)null);
+                    b.ToTable("Shipments");
                 });
 
             modelBuilder.Entity("FarmazonDemo.Models.Entities.ShipmentEvent", b =>
@@ -517,7 +609,7 @@ namespace FarmazonDemo.Migrations
 
                     b.HasIndex("ShipmentId");
 
-                    b.ToTable("ShipmentEvents", (string)null);
+                    b.ToTable("ShipmentEvents");
                 });
 
             modelBuilder.Entity("FarmazonDemo.Models.Entities.Users", b =>
@@ -538,8 +630,23 @@ namespace FarmazonDemo.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("EmailVerificationToken")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("EmailVerificationTokenExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<bool>("EmailVerified")
+                        .HasColumnType("bit");
+
+                    b.Property<int>("FailedLoginAttempts")
+                        .HasColumnType("int");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LockoutEndTime")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -547,6 +654,27 @@ namespace FarmazonDemo.Migrations
 
                     b.Property<string>("Password")
                         .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PasswordResetToken")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("PasswordResetTokenExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("Role")
+                        .HasColumnType("int");
+
+                    b.Property<string>("TwoFactorBackupCodes")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("TwoFactorEnabled")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("TwoFactorEnabledAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("TwoFactorSecretKey")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("UpdatedAt")
@@ -558,7 +686,16 @@ namespace FarmazonDemo.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Users", (string)null);
+                    b.ToTable("Users");
+                });
+
+            modelBuilder.Entity("FarmazonDemo.Models.Entities.AuditLog", b =>
+                {
+                    b.HasOne("FarmazonDemo.Models.Entities.Users", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("FarmazonDemo.Models.Entities.Cart", b =>
@@ -652,6 +789,17 @@ namespace FarmazonDemo.Migrations
                         .IsRequired();
 
                     b.Navigation("Product");
+                });
+
+            modelBuilder.Entity("FarmazonDemo.Models.Entities.RefreshToken", b =>
+                {
+                    b.HasOne("FarmazonDemo.Models.Entities.Users", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("FarmazonDemo.Models.Entities.SellerOrder", b =>

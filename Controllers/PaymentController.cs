@@ -1,11 +1,13 @@
 ﻿using FarmazonDemo.Models.Dto.Payment;
 using FarmazonDemo.Services.Payments;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace FarmazonDemo.Controllers;
 
 [ApiController]
 [Route("api/payments")]
+[Authorize]
 public class PaymentController : ControllerBase
 {
     private readonly IPaymentService _paymentService;

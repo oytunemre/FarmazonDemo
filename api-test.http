@@ -1,0 +1,269 @@
+### FarmazonDemo API Test File
+### Use REST Client extension in VS Code or any HTTP client
+
+@baseUrl = https://localhost:7193
+@token = your_token_here
+
+### Health Check
+GET {{baseUrl}}/health
+
+### Health Ready
+GET {{baseUrl}}/health/ready
+
+###
+### AUTHENTICATION
+###
+
+### 1. Register new user (Customer)
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Test Customer",
+  "email": "customer@test.com",
+  "username": "customer",
+  "password": "Customer123!",
+  "role": 0
+}
+
+### 2. Register new user (Seller)
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Test Seller",
+  "email": "seller@test.com",
+  "username": "seller",
+  "password": "Seller123!",
+  "role": 1
+}
+
+### 3. Register new user (Admin)
+POST {{baseUrl}}/api/auth/register
+Content-Type: application/json
+
+{
+  "name": "Admin User",
+  "email": "admin@test.com",
+  "username": "admin",
+  "password": "Admin123!",
+  "role": 2
+}
+
+### 4. Login
+POST {{baseUrl}}/api/auth/login
+Content-Type: application/json
+
+{
+  "emailOrUsername": "customer",
+  "password": "Customer123!"
+}
+
+### 5. Get current user (requires authentication)
+GET {{baseUrl}}/api/auth/me
+Authorization: Bearer {{token}}
+
+###
+### PRODUCTS
+###
+
+### 1. Get all products (public)
+GET {{baseUrl}}/api/product
+
+### 2. Get product by ID (public)
+GET {{baseUrl}}/api/product/1
+
+### 3. Create product (requires Admin/Seller)
+POST {{baseUrl}}/api/product
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "productName": "Aspirin 500mg",
+  "productDescription": "Pain relief medication",
+  "barcodes": ["8690000123456", "8690000123457"]
+}
+
+### 4. Update product (requires Admin/Seller)
+PUT {{baseUrl}}/api/product/1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "productName": "Aspirin 500mg Updated",
+  "productDescription": "Updated description"
+}
+
+###
+### LISTINGS
+###
+
+### 1. Get all listings (public)
+GET {{baseUrl}}/api/listings
+
+### 2. Get listing by ID (public)
+GET {{baseUrl}}/api/listings/1
+
+### 3. Create listing (requires Admin/Seller)
+POST {{baseUrl}}/api/listings
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "productId": 1,
+  "sellerId": 1,
+  "price": 29.99,
+  "stock": 100,
+  "condition": 0,
+  "isActive": true
+}
+
+###
+### CART
+###
+
+### 1. Get user cart (requires authentication)
+GET {{baseUrl}}/api/cart/1
+Authorization: Bearer {{token}}
+
+### 2. Add to cart (requires authentication)
+POST {{baseUrl}}/api/cart/add
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "userId": 1,
+  "listingId": 1,
+  "quantity": 2
+}
+
+### 3. Update cart item quantity (requires authentication)
+PUT {{baseUrl}}/api/cart/1/item/1
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "quantity": 3
+}
+
+### 4. Remove cart item (requires authentication)
+DELETE {{baseUrl}}/api/cart/1/item/1
+Authorization: Bearer {{token}}
+
+###
+### ORDERS
+###
+
+### 1. Checkout cart (requires authentication)
+POST {{baseUrl}}/api/orders/checkout
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "userId": 1
+}
+
+### 2. Get order by ID (requires authentication)
+GET {{baseUrl}}/api/orders/1
+Authorization: Bearer {{token}}
+
+### 3. Get user orders (requires authentication)
+GET {{baseUrl}}/api/orders/user/1
+Authorization: Bearer {{token}}
+
+###
+### PAYMENTS
+###
+
+### 1. Create payment intent (requires authentication)
+POST {{baseUrl}}/api/payments/intents
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "orderId": 1,
+  "method": 0,
+  "provider": "Manual"
+}
+
+### 2. Get payment by order (requires authentication)
+GET {{baseUrl}}/api/payments/order/1
+Authorization: Bearer {{token}}
+
+### 3. Mark payment as received (requires authentication)
+POST {{baseUrl}}/api/payments/1/mark-received
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "note": "Payment received via bank transfer"
+}
+
+### 4. Simulate payment success (requires authentication)
+POST {{baseUrl}}/api/payments/1/simulate-success
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "reason": "Test successful payment"
+}
+
+###
+### SELLER
+###
+
+### 1. Get seller orders (requires Admin/Seller)
+GET {{baseUrl}}/api/seller/1/orders
+Authorization: Bearer {{token}}
+
+### 2. Ship order (requires Admin/Seller)
+PATCH {{baseUrl}}/api/seller/orders/1/ship
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "carrier": "DHL",
+  "trackingNumber": "DHL123456789"
+}
+
+### 3. Mark as delivered (requires Admin/Seller)
+PATCH {{baseUrl}}/api/seller/orders/1/deliver
+Authorization: Bearer {{token}}
+
+###
+### SHIPMENTS
+###
+
+### 1. Get shipment details (requires Admin/Seller)
+GET {{baseUrl}}/api/shipments/seller-orders/1
+Authorization: Bearer {{token}}
+
+### 2. Ship seller order (requires Admin/Seller)
+PATCH {{baseUrl}}/api/shipments/seller-orders/1/ship
+Content-Type: application/json
+Authorization: Bearer {{token}}
+
+{
+  "carrier": "UPS",
+  "trackingNumber": "UPS987654321"
+}
+
+### 3. Deliver seller order (requires Admin/Seller)
+PATCH {{baseUrl}}/api/shipments/seller-orders/1/deliver
+Authorization: Bearer {{token}}
+
+### 4. Get shipment timeline (requires Admin/Seller)
+GET {{baseUrl}}/api/shipments/seller-orders/1/timeline
+Authorization: Bearer {{token}}
+
+###
+### USERS (Admin only)
+###
+
+### 1. Get all users (requires Admin)
+GET {{baseUrl}}/api/user
+Authorization: Bearer {{token}}
+
+### 2. Get user by ID (requires Admin)
+GET {{baseUrl}}/api/user/1
+Authorization: Bearer {{token}}

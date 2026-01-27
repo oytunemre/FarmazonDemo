@@ -21,6 +21,8 @@ namespace FarmazonDemo.Data
         public DbSet<PaymentEvent> PaymentEvents => Set<PaymentEvent>();
         public DbSet<Shipment> Shipments => Set<Shipment>();
         public DbSet<ShipmentEvent> ShipmentEvents => Set<ShipmentEvent>();
+        public DbSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<AuditLog> AuditLogs { get; set; }
 
 
 
@@ -185,6 +187,13 @@ namespace FarmazonDemo.Data
                 // ✅ Matching filter: Shipment gizlenirse event de gizlensin
                 b.HasQueryFilter(e => !e.Shipment.IsDeleted);
             });
+
+            // RefreshToken -> User
+            modelBuilder.Entity<RefreshToken>()
+                .HasOne(rt => rt.User)
+                .WithMany()
+                .HasForeignKey(rt => rt.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
 
         }
 
