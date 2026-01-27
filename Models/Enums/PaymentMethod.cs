@@ -4,5 +4,9 @@ public enum PaymentMethod
 {
     CashOnDelivery = 1,   // Kapıda ödeme
     BankTransfer = 2,     // Havale / EFT
-    ManualCard = 3        // Fake / test kart ödemesi
+    CreditCard = 3,       // Kredi kartı
+    DebitCard = 4,        // Banka kartı
+    Wallet = 5,           // Dijital cüzdan (PayPal, Apple Pay vb.)
+    Installment = 6,      // Taksitli ödeme
+    BuyNowPayLater = 7    // Şimdi al sonra öde
 }
