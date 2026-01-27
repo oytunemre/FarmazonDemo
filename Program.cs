@@ -24,6 +24,8 @@ using FarmazonDemo.Services.Categories;
 using FarmazonDemo.Services.Files;
 using FarmazonDemo.Services.Profile;
 using FarmazonDemo.Services.Notifications;
+using FarmazonDemo.Services.Dashboard;
+using FarmazonDemo.Services.Reports;
 using FarmazonDemo.Models.Dto;
 using System.Threading.RateLimiting;
 
@@ -170,6 +172,10 @@ builder.Services.AddScoped<IFileService, FileService>();
 // Profile & Notification Services
 builder.Services.AddScoped<IProfileService, ProfileService>();
 builder.Services.AddScoped<INotificationService, NotificationService>();
+
+// Dashboard & Report Services
+builder.Services.AddScoped<IDashboardService, DashboardService>();
+builder.Services.AddScoped<IReportService, ReportService>();
 
 // --------------------
 // BUILD
